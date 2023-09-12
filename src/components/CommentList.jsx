@@ -44,8 +44,10 @@ const CommentList = (props) => {
   }, [props.asin]);
 
   return (
-    <ListGroup variant='flush'>
-      <ListGroup.Item className='d-flex align-items-start bg-success text-white '>Recensioni libro: </ListGroup.Item>
+    <ListGroup variant='flush' className='overflow-hidden'>
+      <ListGroup.Item className='d-flex align-items-start bg-success text-white'>
+        Recensioni libro: {props.asin}
+      </ListGroup.Item>
 
       {hasErrors && <Alert variant='danger'>C'è stato un'errore nel caricamento dei commenti</Alert>}
 

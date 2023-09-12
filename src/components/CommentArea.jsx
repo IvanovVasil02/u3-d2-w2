@@ -1,25 +1,26 @@
 import { useState } from "react";
-import { FloatingLabel, Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 
 const CommentArea = (props) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasErrors, setHasErrors] = useState(false);
-  const [comment, setComment] = useState({
-    email: "",
-    textComment: "",
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [hasErrors, setHasErrors] = useState(false);
+  const [personalComment, setPersonalComment] = useState({
+    elementId: props.asin,
+    rate: "",
+    comment: "",
   });
 
   const handleChange = (fieldName, fieldValue) => {
-    setComment({ ...comment, [fieldName]: fieldValue });
+    setPersonalComment({ ...personalComment, [fieldName]: fieldValue });
   };
 
   const handleSubmmit = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await fetch(URL, {
+      const response = await fetch("https://striveschool-api.herokuapp.com/api/comments", {
         method: "POST",
-        body: JSON.stringify(comment),
+        body: JSON.stringify(personalComment),
         headers: {
           "Content-Type": "application/json",
           Authorization:
@@ -27,30 +28,29 @@ const CommentArea = (props) => {
         },
       });
 
-      setComment(comment);
+      setPersonalComment(personalComment);
 
       console.log(response);
 
       if (response.ok) {
-        setComment({ email: "", textComment: "" });
+        setPersonalComment({ author: "", elementId: "", rate: "", comment: "" });
+        console.log("inviato con successo");
       }
     } catch (error) {
-      setHasErrors(true);
+      // setHasErrors(true);
       console.log(error);
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
   return (
-    <Form>
-      <Form.Group controlId='formBasicEmail'>
-        <FloatingLabel controlId='floatingTextarea' label='Email: Inserisci la tua email '>
-          <Form.Control type='text' required />
-        </FloatingLabel>
-      </Form.Group>
-
-      <Form.Select aria-label='Default select example' className='my-2'>
+    <Form onSubmit={handleSubmmit}>
+      <Form.Select
+        aria-label='Default select example'
+        onChange={(event) => handleChange("rate", event.target.value)}
+        className='my-2'
+      >
         <option value=''>Dai un voto al libro</option>
         <option>1</option>
         <option>2</option>
@@ -59,9 +59,16 @@ const CommentArea = (props) => {
         <option>5</option>
       </Form.Select>
 
-      <FloatingLabel controlId='floatingTextarea' label='Lascia qui la tua recensione e premi invio!' className='mb-3 '>
-        <Form.Control as='textarea' />
-      </FloatingLabel>
+      <div className='d-flex'>
+        <Form.Control
+          as='textarea'
+          onChange={(event) => handleChange("comment", event.target.value)}
+          placeholder='Lascia qui il tuo commento'
+        />
+        <Button variant='primary' type='submit'>
+          Invio
+        </Button>
+      </div>
     </Form>
   );
 };
